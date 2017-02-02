@@ -181,8 +181,14 @@
 
 (defn all-specs []
   (->> (reachable-namespaces)
-       (map spec-defs-in-ns)
-       (remove (comp empty? second))
-       (into {})))
+       (map (comp second spec-defs-in-ns))
+       (remove empty?)
+       (reduce merge {})))
 
-(time (all-specs))
+
+(comment
+
+  (s/def :test/nilllllable (s/nilable :clojure.core.specs/arg-list))
+  (time (all-specs))
+
+  )
