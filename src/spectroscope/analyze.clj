@@ -166,18 +166,23 @@
 (defn spec-defs-in-ns [ns-name]
   (with-open [rdr (ns-reader ns-name)]
     [ns-name
-     (loop [specs {}]
-       (let [form (binding [*ns* ns-name] (r/read {:eof EOF :read-cond :allow} rdr))]
+     (loop [specs {}
+            aliases {}]
+       (let [form (binding [*ns* ns-name r/*alias-map* aliases]
+                    (r/read {:eof EOF :read-cond :allow} rdr))]
          (if (= EOF form)
            specs
            (if (seq? form)
              (let [[op arg1 arg2 :as form]
                    (walk/postwalk #(resolve-alias {} ns-name %) form)]
-               (if (and (contains? `#{s/def s/fdef} op)
-                        (seq? arg2))
-                 (recur (assoc specs arg1 arg2))
-                 (recur specs)))
-             (recur specs)))))]))
+               (cond (= 'alias op)
+                     (recur specs (assoc aliases arg1 arg2))
+                     (and (contains? `#{s/def s/fdef} op)
+                          (seq? arg2))
+                     (recur (assoc specs arg1 arg2) aliases)
+                     :else
+                     (recur specs aliases)))
+             (recur specs aliases)))))]))
 
 (defn all-specs []
   (->> (reachable-namespaces)
