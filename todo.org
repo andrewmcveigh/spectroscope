@@ -1,0 +1,19 @@
+* what's missing is
+
+  - working out current ns map
+
+  - keeping a record of current namespace mapping through defs and
+    aliases
+
+  - less naive version of ^^ i.e., one that expands macros, and
+    doesn't just look at top-level forms.
+
+  - more flexible reader, i.e., only reading, nothing other than
+    read, no ns resolve, no record construct, no read-eval, etc.
+
+  - get source of macros looking for 'def'-like forms
+
+  - if we see 'def'-like forms, attempt to expand macros we can prove
+    to be pure
+
+  - any forms with 'def'-likes need to be examined
